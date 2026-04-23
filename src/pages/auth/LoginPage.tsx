@@ -13,6 +13,7 @@ export default function LoginPage() {
   const [remember, setRemember] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validate = () => {
@@ -32,7 +33,8 @@ export default function LoginPage() {
     setError('');
     try {
       await login(email, password);
-      navigate('/dashboard');
+      setSuccess(true);
+      setTimeout(() => navigate('/dashboard'), 1200);
     } catch {
       setError('Invalid credentials. Please try again.');
     } finally {
@@ -48,6 +50,7 @@ export default function LoginPage() {
       </div>
 
       <GlassCard className="p-8">
+        {success && <Alert variant="success" className="mb-6">Connexion réussie ! Redirecting…</Alert>}
         {error && <Alert variant="error" onClose={() => setError('')} className="mb-6">{error}</Alert>}
 
         <form onSubmit={submit} className="space-y-5">

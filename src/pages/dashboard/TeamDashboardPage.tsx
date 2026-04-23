@@ -98,8 +98,7 @@ export default function TeamDashboardPage() {
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
     } catch (err) {
-      if (err instanceof TypeError) { setSaved(true); setTimeout(() => setSaved(false), 2500); }
-      else setSaveError(err instanceof Error ? err.message : 'Failed to save');
+      setSaveError(err instanceof Error ? err.message : 'Failed to save. Check your connection and try again.');
     } finally {
       setSaving(false);
     }
@@ -160,7 +159,7 @@ export default function TeamDashboardPage() {
           <p className="text-slate-400 text-sm mt-0.5">Track progress, budget, and outreach</p>
         </div>
         <GradientButton size="md" onClick={save} disabled={saving}>
-          {saving ? 'Saving...' : 'Save changes'}
+          {saving ? 'Saving...' : 'Sauvegarder Tout'}
         </GradientButton>
       </div>
 
@@ -177,21 +176,21 @@ export default function TeamDashboardPage() {
               <div key={proj.name}>
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-medium text-slate-200">{proj.name}</span>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3">
                     {pct >= 100
                       ? <CheckCircle className="h-4 w-4 text-green-400" />
                       : pct < 30
                       ? <AlertCircle className="h-4 w-4 text-orange-400" />
                       : null}
                     <input
-                      type="number"
+                      type="range"
                       min={0}
                       max={100}
                       value={pct}
                       onChange={e => updateProject(i, Number(e.target.value))}
-                      className="w-16 text-right bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-sm text-white outline-none focus:border-blue-500 transition-colors"
+                      className="w-28 accent-blue-500 cursor-pointer"
                     />
-                    <span className="text-xs text-slate-500">%</span>
+                    <span className="text-sm text-white w-10 text-right tabular-nums">{pct}%</span>
                   </div>
                 </div>
                 <div className="h-2 rounded-full bg-white/5 overflow-hidden">

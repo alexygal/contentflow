@@ -74,8 +74,8 @@ export default function AppRouter() {
             <Route path="team" element={<TeamDashboardPage />} />
           </Route>
 
-          {/* Admin — protected + role-gated inside AdminPage */}
-          <Route path="/admin" element={<DashboardLayout />}>
+          {/* Admin — protected at router level with role check */}
+          <Route path="/admin" element={<ProtectedRoute requiredRole="admin"><DashboardLayout /></ProtectedRoute>}>
             <Route index element={<AdminPage />} />
           </Route>
 
