@@ -1,33 +1,34 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BarChart2, Clock, Eye, Heart, Sparkles, TrendingUp } from 'lucide-react';
 import {
   Area, AreaChart, Bar, BarChart, CartesianGrid,
   Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from 'recharts';
 import { GlassCard, OutlineButton, StatCard } from '../../components/ui';
+import { api } from '../../utils/api';
 
-const VIEWS_DATA = [
+const MOCK_VIEWS_DATA = [
   { date: 'Apr 1', views: 38000 }, { date: 'Apr 3', views: 52000 }, { date: 'Apr 5', views: 45000 },
   { date: 'Apr 7', views: 67000 }, { date: 'Apr 9', views: 58000 }, { date: 'Apr 11', views: 72000 },
   { date: 'Apr 13', views: 89000 }, { date: 'Apr 15', views: 95000 }, { date: 'Apr 17', views: 110000 },
   { date: 'Apr 19', views: 98000 }, { date: 'Apr 21', views: 125000 }, { date: 'Apr 23', views: 134000 },
 ];
 
-const PLATFORM_DATA = [
+const MOCK_PLATFORM_DATA = [
   { platform: 'YouTube', views: 680000, engagement: 4.2, revenue: 5200 },
   { platform: 'TikTok', views: 380000, engagement: 7.8, revenue: 1800 },
   { platform: 'Instagram', views: 140000, engagement: 6.1, revenue: 950 },
   { platform: 'LinkedIn', views: 28000, engagement: 5.3, revenue: 500 },
 ];
 
-const PIE_DATA = [
+const MOCK_PIE_DATA = [
   { name: 'YouTube', value: 56, fill: '#ef4444' },
   { name: 'TikTok', value: 26, fill: '#ec4899' },
   { name: 'Instagram', value: 13, fill: '#8b5cf6' },
   { name: 'LinkedIn', value: 5, fill: '#3b82f6' },
 ];
 
-const TOP_CONTENT = [
+const MOCK_TOP_CONTENT = [
   { title: 'How I Built a 6-Figure Creator Business', platform: 'YouTube', views: '285K', engagement: '8.2%', revenue: '€1,240', growth: '+124%' },
   { title: '10 AI Tools Every Creator Needs in 2025', platform: 'TikTok', views: '187K', engagement: '9.4%', revenue: '€340', growth: '+89%' },
   { title: 'Morning Routine Revealed', platform: 'Instagram', views: '94K', engagement: '6.8%', revenue: '€210', growth: '+45%' },
@@ -35,7 +36,7 @@ const TOP_CONTENT = [
   { title: 'Tool Teardown: ContentFlow vs Descript', platform: 'YouTube', views: '62K', engagement: '7.1%', revenue: '€680', growth: '+32%' },
 ];
 
-const INSIGHTS = [
+const MOCK_INSIGHTS = [
   { icon: '🔥', insight: 'Your "How I Built" series gets 3.4× higher retention than your other content. Consider making it a weekly format.' },
   { icon: '⚡', insight: 'TikTok engagement is 86% higher than YouTube for you. You may be under-investing in short-form content.' },
   { icon: '💡', insight: 'Videos posted Tuesday 9AM–11AM get 42% more views in the first 24 hours.' },
@@ -53,6 +54,21 @@ const CHART_TOOLTIP_STYLE = {
 export default function AnalyticsPage() {
   const [range, setRange] = useState('30d');
   const ranges = ['7d', '30d', '90d', 'All time'];
+
+  const [viewsData, setViewsData] = useState(MOCK_VIEWS_DATA);
+  const [platformData, setPlatformData] = useState(MOCK_PLATFORM_DATA);
+  const [pieData, setPieData] = useState(MOCK_PIE_DATA);
+  const [topContent, setTopContent] = useState(MOCK_TOP_CONTENT);
+  const [insights, setInsights] = useState(MOCK_INSIGHTS);
+
+  useEffect(() => {
+    const params = `?range=${range}`;
+    api.get<typeof MOCK_VIEWS_DATA>(`/api/analytics/views${params}`).then(setViewsData).catch(() => {});
+    api.get<typeof MOCK_PLATFORM_DATA>(`/api/analytics/platforms${params}`).then(setPlatformData).catch(() => {});
+    api.get<typeof MOCK_PIE_DATA>(`/api/analytics/split${params}`).then(setPieData).catch(() => {});
+    api.get<typeof MOCK_TOP_CONTENT>(`/api/analytics/content${params}`).then(setTopContent).catch(() => {});
+    api.get<typeof MOCK_INSIGHTS>(`/api/analytics/insights${params}`).then(setInsights).catch(() => {});
+  }, [range]);
 
   return (
     <div className="p-6 lg:p-8 space-y-6 max-w-[1400px]">
@@ -91,7 +107,7 @@ export default function AnalyticsPage() {
             <OutlineButton size="sm">Export</OutlineButton>
           </div>
           <ResponsiveContainer width="100%" height={200}>
-            <AreaChart data={VIEWS_DATA}>
+            <AreaChart data={viewsData}>
               <defs>
                 <linearGradient id="viewsGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#2563EB" stopOpacity={0.3} />
@@ -112,14 +128,14 @@ export default function AnalyticsPage() {
           <h3 className="font-semibold text-white mb-5">Platform Split</h3>
           <ResponsiveContainer width="100%" height={160}>
             <PieChart>
-              <Pie data={PIE_DATA} cx="50%" cy="50%" innerRadius={45} outerRadius={70} dataKey="value" stroke="none">
-                {PIE_DATA.map((entry, i) => <Cell key={i} fill={entry.fill} />)}
+              <Pie data={pieData} cx="50%" cy="50%" innerRadius={45} outerRadius={70} dataKey="value" stroke="none">
+                {pieData.map((entry, i) => <Cell key={i} fill={entry.fill} />)}
               </Pie>
               <Tooltip contentStyle={CHART_TOOLTIP_STYLE} formatter={(v: number) => [`${v}%`]} />
             </PieChart>
           </ResponsiveContainer>
           <div className="space-y-2 mt-3">
-            {PIE_DATA.map((p) => (
+            {pieData.map((p) => (
               <div key={p.name} className="flex items-center gap-2.5">
                 <div className="h-2.5 w-2.5 rounded-full shrink-0" style={{ background: p.fill }} />
                 <span className="text-xs text-slate-400 flex-1">{p.name}</span>
@@ -134,7 +150,7 @@ export default function AnalyticsPage() {
       <GlassCard className="p-6">
         <h3 className="font-semibold text-white mb-5">Platform Performance</h3>
         <ResponsiveContainer width="100%" height={200}>
-          <BarChart data={PLATFORM_DATA}>
+          <BarChart data={platformData}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
             <XAxis dataKey="platform" tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} />
             <YAxis tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={v => `${v / 1000}K`} />
@@ -160,7 +176,7 @@ export default function AnalyticsPage() {
               </tr>
             </thead>
             <tbody>
-              {TOP_CONTENT.map((c, i) => (
+              {topContent.map((c, i) => (
                 <tr key={i} className="border-b border-white/5 hover:bg-white/2 transition-colors">
                   <td className="px-4 py-3 text-sm text-white max-w-xs truncate">{c.title}</td>
                   <td className="px-4 py-3 text-sm text-slate-400">{c.platform}</td>
@@ -181,7 +197,7 @@ export default function AnalyticsPage() {
           <Sparkles className="h-4 w-4 text-blue-400" />AI Insights
         </h2>
         <div className="grid sm:grid-cols-2 gap-3">
-          {INSIGHTS.map((ins, i) => (
+          {insights.map((ins, i) => (
             <GlassCard key={i} className="p-4 flex items-start gap-3">
               <span className="text-xl shrink-0">{ins.icon}</span>
               <p className="text-sm text-slate-300 leading-relaxed">{ins.insight}</p>

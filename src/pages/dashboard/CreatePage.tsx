@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Check, Copy, PenLine, RefreshCw, Save, Sparkles, Star, Wand2 } from 'lucide-react';
 import { Alert, GlassCard, GradientButton, OutlineButton, Select, TabBar, TextArea } from '../../components/ui';
+import { api } from '../../utils/api';
 
 type Tab = 'script' | 'caption' | 'email' | 'ideas' | 'thumbnail';
 
@@ -19,7 +20,7 @@ const PLATFORMS = [
   { value: 'linkedin', label: 'LinkedIn' },
 ];
 
-const HISTORY = [
+const MOCK_HISTORY = [
   { type: 'Script', title: 'How I Built a 6-Figure Creator Business', time: '2h ago', status: 'approved' },
   { type: 'Caption', title: '10 AI Tools Every Creator Needs in 2025', time: '4h ago', status: 'pending' },
   { type: 'Email', title: 'Partnership Pitch — NovaTech Collaboration', time: '1d ago', status: 'approved' },
@@ -151,6 +152,11 @@ SIZE: 1280×720px, safe zone for all devices`,
 
 export default function CreatePage() {
   const [tab, setTab] = useState<Tab>('script');
+  const [history, setHistory] = useState(MOCK_HISTORY);
+
+  useEffect(() => {
+    api.get<typeof MOCK_HISTORY>('/api/content/history').then(setHistory).catch(() => {});
+  }, []);
   const [topic, setTopic] = useState('');
   const [platform, setPlatform] = useState('youtube');
   const [tone, setTone] = useState('educational');
@@ -312,7 +318,7 @@ export default function CreatePage() {
         <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-widest mb-3">Recent History</h2>
         <GlassCard>
           <div className="divide-y divide-white/5">
-            {HISTORY.map((item, i) => (
+            {history.map((item, i) => (
               <div key={i} className="flex items-center gap-4 px-5 py-3.5 hover:bg-white/3 transition-colors cursor-pointer">
                 <div className="h-8 w-8 rounded-lg bg-white/8 border border-white/10 flex items-center justify-center shrink-0">
                   <PenLine className="h-3.5 w-3.5 text-blue-400" />

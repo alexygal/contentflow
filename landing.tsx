@@ -171,7 +171,7 @@ const translations = {
         about: 'About Us', blog: 'Blog', careers: 'Careers', contact: 'Contact',
         privacy: 'Privacy Policy', terms: 'Terms of Service', cookies: 'Cookie Policy',
       },
-      copy: '© 2025 ContentFlow. All rights reserved.',
+      copy: '© 2026 ContentFlow. All rights reserved.',
     },
   },
   fr: {
@@ -265,7 +265,7 @@ const translations = {
       desc: "Votre gestionnaire de contenu IA. Scripts, vidéos, partenariats et analytics—gérés automatiquement pour que vous vous consacriez à la création.",
       product: 'Produit', company: 'Entreprise', legal: 'Légal',
       links: { features: 'Fonctionnalités', pricing: 'Tarifs', hiw: 'Comment ça marche', changelog: 'Changelog', about: 'À propos', blog: 'Blog', careers: 'Carrières', contact: 'Contact', privacy: 'Confidentialité', terms: "Conditions d'utilisation", cookies: 'Cookies' },
-      copy: '© 2025 ContentFlow. Tous droits réservés.',
+      copy: '© 2026 ContentFlow. Tous droits réservés.',
     },
   },
   es: {
@@ -359,7 +359,7 @@ const translations = {
       desc: 'Tu gestor de operaciones de contenido IA. Scripts, videos, partnerships y analytics—gestionados automáticamente para que te concentres en crear.',
       product: 'Producto', company: 'Empresa', legal: 'Legal',
       links: { features: 'Características', pricing: 'Precios', hiw: 'Cómo Funciona', changelog: 'Cambios', about: 'Sobre Nosotros', blog: 'Blog', careers: 'Carreras', contact: 'Contacto', privacy: 'Privacidad', terms: 'Términos', cookies: 'Cookies' },
-      copy: '© 2025 ContentFlow. Todos los derechos reservados.',
+      copy: '© 2026 ContentFlow. Todos los derechos reservados.',
     },
   },
 } as const;

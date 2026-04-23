@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Calendar, ChevronLeft, ChevronRight, Cloud, Instagram, Layers, Link2, Loader2, Plus, Upload, Video, Youtube } from 'lucide-react';
 import { GlassCard, GradientButton, OutlineButton, StatCard, StatusPill, TabBar } from '../../components/ui';
+import { api } from '../../utils/api';
 
-const QUEUE = [
+const MOCK_QUEUE = [
   { title: 'Productivity Secrets of Top Creators', platform: 'YouTube', scheduledAt: 'Today, 3:00 PM', status: 'scheduled', duration: '14:32' },
   { title: 'Tool Teardown: ContentFlow vs Descript', platform: 'TikTok', scheduledAt: 'Tomorrow, 10:00 AM', status: 'processing', duration: '00:58' },
   { title: 'Q&A: Your AI Questions Answered', platform: 'Instagram', scheduledAt: 'Apr 25, 2:00 PM', status: 'draft', duration: '05:12' },
@@ -10,7 +11,7 @@ const QUEUE = [
   { title: 'Morning Routine Revealed', platform: 'TikTok', scheduledAt: 'Apr 28, 12:00 PM', status: 'draft', duration: '01:05' },
 ];
 
-const PLATFORMS = [
+const MOCK_PLATFORMS = [
   { name: 'YouTube', icon: <Youtube className="h-5 w-5" />, color: 'text-red-400', connected: true, channel: '@alexrivera • 512K subs' },
   { name: 'TikTok', icon: <Video className="h-5 w-5" />, color: 'text-pink-400', connected: true, channel: '@alexrivera • 234K followers' },
   { name: 'Instagram', icon: <Instagram className="h-5 w-5" />, color: 'text-violet-400', connected: true, channel: '@alexrivera • 89K followers' },
@@ -29,6 +30,18 @@ export default function OperationsPage() {
   const [tab, setTab] = useState('queue');
   const [dragging, setDragging] = useState(false);
   const [calView, setCalView] = useState<'week' | 'month'>('week');
+  const [queue, setQueue] = useState(MOCK_QUEUE);
+  const [platforms, setPlatforms] = useState(MOCK_PLATFORMS);
+
+  useEffect(() => {
+    api.get<typeof MOCK_QUEUE>('/api/operations/queue').then(setQueue).catch(() => {});
+    api.get<{ name: string; connected: boolean; channel: string }[]>('/api/platforms')
+      .then(data => setPlatforms(prev => prev.map(p => {
+        const remote = data.find(d => d.name === p.name);
+        return remote ? { ...p, ...remote } : p;
+      })))
+      .catch(() => {});
+  }, []);
 
   return (
     <div className="p-6 lg:p-8 space-y-6 max-w-[1400px]">
@@ -74,7 +87,7 @@ export default function OperationsPage() {
             </div>
             <GlassCard>
               <div className="divide-y divide-white/5">
-                {QUEUE.map((item, i) => (
+                {queue.map((item, i) => (
                   <div key={i} className="flex items-center gap-4 px-5 py-3.5 hover:bg-white/3 transition-colors">
                     <div className="h-9 w-9 rounded-lg bg-[#0F172A] border border-white/8 flex items-center justify-center shrink-0">
                       <Video className="h-4 w-4 text-slate-400" />
@@ -125,7 +138,7 @@ export default function OperationsPage() {
           <GlassCard className="p-5">
             <h3 className="font-semibold text-white text-sm mb-4">Platform Connections</h3>
             <div className="space-y-3">
-              {PLATFORMS.map((p) => (
+              {platforms.map((p) => (
                 <div key={p.name} className="flex items-center gap-3">
                   <div className={`h-9 w-9 rounded-lg bg-white/5 border border-white/8 flex items-center justify-center shrink-0 ${p.color}`}>
                     {p.icon}

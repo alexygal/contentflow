@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight, BarChart2, Briefcase, CheckSquare, Clock,
@@ -6,8 +6,9 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { GlassCard, GradientButton, StatCard, StatusPill } from '../../components/ui';
+import { api } from '../../utils/api';
 
-const RECENT_CONTENT = [
+const MOCK_RECENT_CONTENT = [
   { title: 'How I Built a 6-Figure Creator Business', type: 'Script', platform: 'YouTube', status: 'approved', time: '2h ago' },
   { title: '10 AI Tools Every Creator Needs in 2025', type: 'Caption', platform: 'TikTok', status: 'pending', time: '4h ago' },
   { title: 'My Morning Routine for Maximum Productivity', type: 'Script', platform: 'YouTube', status: 'published', time: '1d ago' },
@@ -15,13 +16,13 @@ const RECENT_CONTENT = [
   { title: 'Weekend Vlog - NYC Edition', type: 'Caption', platform: 'Instagram', status: 'published', time: '2d ago' },
 ];
 
-const SCHEDULED = [
+const MOCK_SCHEDULED = [
   { title: 'Productivity Secrets of Top Creators', platform: 'YouTube', date: 'Today, 3:00 PM', icon: '▶' },
   { title: 'Tool Teardown: ContentFlow vs Descript', platform: 'TikTok', date: 'Tomorrow, 10:00 AM', icon: '📱' },
   { title: 'Q&A: Your AI Questions Answered', platform: 'Instagram', date: 'Apr 25, 2:00 PM', icon: '📸' },
 ];
 
-const OPPORTUNITIES = [
+const MOCK_OPPORTUNITIES = [
   { brand: 'TechGadgets Pro', category: 'Software', value: '€1,200', fit: 96, color: 'bg-blue-600' },
   { brand: 'FocusFlow App', category: 'Productivity', value: '€800', fit: 91, color: 'bg-violet-600' },
   { brand: 'Creator Academy', category: 'Education', value: '€2,500', fit: 88, color: 'bg-pink-600' },
@@ -38,6 +39,16 @@ export default function OverviewPage() {
   const { user } = useAuth();
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+
+  const [recentContent, setRecentContent] = useState(MOCK_RECENT_CONTENT);
+  const [scheduled, setScheduled] = useState(MOCK_SCHEDULED);
+  const [opportunities, setOpportunities] = useState(MOCK_OPPORTUNITIES);
+
+  useEffect(() => {
+    api.get<typeof MOCK_RECENT_CONTENT>('/api/content/recent').then(setRecentContent).catch(() => {});
+    api.get<typeof MOCK_SCHEDULED>('/api/content/scheduled').then(setScheduled).catch(() => {});
+    api.get<typeof MOCK_OPPORTUNITIES>('/api/partnerships/opportunities').then(setOpportunities).catch(() => {});
+  }, []);
 
   return (
     <div className="p-6 lg:p-8 space-y-7 max-w-[1400px]">
@@ -88,7 +99,7 @@ export default function OverviewPage() {
           </div>
           <GlassCard>
             <div className="divide-y divide-white/5">
-              {RECENT_CONTENT.map((item, i) => (
+              {recentContent.map((item, i) => (
                 <div key={i} className="flex items-center gap-4 px-5 py-3.5 hover:bg-white/3 transition-colors">
                   <div className="h-8 w-8 rounded-lg bg-white/8 border border-white/10 flex items-center justify-center shrink-0">
                     {item.type === 'Script' ? <PenLine className="h-3.5 w-3.5 text-blue-400" /> :
@@ -115,7 +126,7 @@ export default function OverviewPage() {
               <Link to="/dashboard/operations" className="text-xs text-blue-400 hover:text-blue-300 transition-colors">Calendar →</Link>
             </div>
             <div className="space-y-2.5">
-              {SCHEDULED.map((s, i) => (
+              {scheduled.map((s, i) => (
                 <GlassCard key={i} className="p-4">
                   <div className="flex items-start gap-3">
                     <span className="text-lg">{s.icon}</span>
@@ -140,7 +151,7 @@ export default function OverviewPage() {
               <Link to="/dashboard/partnerships" className="text-xs text-blue-400 hover:text-blue-300 transition-colors">View all →</Link>
             </div>
             <div className="space-y-2.5">
-              {OPPORTUNITIES.map((o, i) => (
+              {opportunities.map((o, i) => (
                 <GlassCard key={i} hover className="p-4 cursor-pointer">
                   <div className="flex items-center gap-3">
                     <div className={`h-9 w-9 rounded-lg ${o.color} flex items-center justify-center text-white text-xs font-bold shrink-0`}>

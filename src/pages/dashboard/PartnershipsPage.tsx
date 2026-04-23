@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ArrowRight, Briefcase, DollarSign, Mail, Plus, TrendingUp } from 'lucide-react';
 import { GlassCard, GradientButton, OutlineButton, StatCard, StatusPill, TabBar } from '../../components/ui';
+import { api } from '../../utils/api';
 
 type Stage = 'identified' | 'contacted' | 'negotiating' | 'closed';
 
-const OPPORTUNITIES = [
+const MOCK_OPPORTUNITIES = [
   { brand: 'NovaTech Software', category: 'SaaS', fit: 96, value: '€1,200', audience: 'Tech-savvy creators', logo: 'NT', color: 'bg-blue-600' },
   { brand: 'FocusFlow App', category: 'Productivity', fit: 91, value: '€800', audience: 'Productivity creators', logo: 'FF', color: 'bg-violet-600' },
   { brand: 'Creator Academy', category: 'Education', fit: 88, value: '€2,500', audience: 'Aspiring creators', logo: 'CA', color: 'bg-pink-600' },
@@ -13,7 +14,7 @@ const OPPORTUNITIES = [
   { brand: 'ClipSync', category: 'Software', fit: 75, value: '€950', audience: 'Video creators', logo: 'CS', color: 'bg-cyan-600' },
 ];
 
-const PIPELINE: Record<Stage, { brand: string; value: string; color: string }[]> = {
+const MOCK_PIPELINE: Record<Stage, { brand: string; value: string; color: string }[]> = {
   identified: [
     { brand: 'StreamDeck Pro', value: '€1,800', color: 'bg-emerald-600' },
     { brand: 'AudioLab Studio', value: '€600', color: 'bg-orange-600' },
@@ -46,7 +47,7 @@ const STAGE_COLORS: Record<Stage, string> = {
   closed: 'text-green-400 border-green-700',
 };
 
-const REVENUE = [
+const MOCK_REVENUE = [
   { brand: 'TechGadgets Pro', amount: '€1,500', date: 'Apr 15', type: 'Dedicated video', status: 'paid' },
   { brand: 'MindMap AI', amount: '€900', date: 'Apr 8', type: 'Integration mention', status: 'paid' },
   { brand: 'FocusFlow App', amount: '€800', date: 'Apr 1', type: 'Review + affiliate', status: 'processing' },
@@ -62,6 +63,15 @@ const TABS = [
 
 export default function PartnershipsPage() {
   const [tab, setTab] = useState('opportunities');
+  const [opportunities, setOpportunities] = useState(MOCK_OPPORTUNITIES);
+  const [pipeline, setPipeline] = useState(MOCK_PIPELINE);
+  const [revenue, setRevenue] = useState(MOCK_REVENUE);
+
+  useEffect(() => {
+    api.get<typeof MOCK_OPPORTUNITIES>('/api/partnerships/opportunities').then(setOpportunities).catch(() => {});
+    api.get<typeof MOCK_PIPELINE>('/api/partnerships/pipeline').then(setPipeline).catch(() => {});
+    api.get<typeof MOCK_REVENUE>('/api/partnerships/revenue').then(setRevenue).catch(() => {});
+  }, []);
 
   return (
     <div className="p-6 lg:p-8 space-y-6 max-w-[1400px]">
@@ -84,7 +94,7 @@ export default function PartnershipsPage() {
 
       {tab === 'opportunities' && (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {OPPORTUNITIES.map((opp, i) => (
+          {opportunities.map((opp, i) => (
             <GlassCard key={i} hover className="p-5">
               <div className="flex items-start gap-3 mb-4">
                 <div className={`h-11 w-11 rounded-xl ${opp.color} flex items-center justify-center text-white text-sm font-bold shrink-0`}>
@@ -127,7 +137,7 @@ export default function PartnershipsPage() {
 
       {tab === 'pipeline' && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 overflow-x-auto">
-          {(Object.entries(PIPELINE) as [Stage, typeof PIPELINE[Stage]][]).map(([stage, deals]) => (
+          {(Object.entries(pipeline) as [Stage, typeof MOCK_PIPELINE[Stage]][]).map(([stage, deals]) => (
             <div key={stage} className="min-w-[200px]">
               <div className={`flex items-center justify-between mb-3 pb-2 border-b ${STAGE_COLORS[stage]}`}>
                 <span className={`text-xs font-semibold ${STAGE_COLORS[stage].split(' ')[0]}`}>{STAGE_LABELS[stage]}</span>
@@ -176,7 +186,7 @@ export default function PartnershipsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {REVENUE.map((r, i) => (
+                  {revenue.map((r, i) => (
                     <tr key={i} className="border-b border-white/5 hover:bg-white/2 transition-colors">
                       <td className="px-4 py-3 text-sm text-white font-medium">{r.brand}</td>
                       <td className="px-4 py-3 text-sm font-bold text-green-400">{r.amount}</td>

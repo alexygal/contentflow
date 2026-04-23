@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CheckCircle, Clock, PenLine, Star, ThumbsDown, ThumbsUp, X } from 'lucide-react';
 import { GlassCard, OutlineButton, StatusPill, TabBar } from '../../components/ui';
+import { api } from '../../utils/api';
 
 type ApprovalStatus = 'pending' | 'approved' | 'rejected';
 type Item = { id: number; title: string; platform: string; createdAt: string; preview: string; status: ApprovalStatus };
@@ -92,6 +93,10 @@ function ApprovalCard({ item, onApprove, onReject }: { item: Item; onApprove: (i
 export default function ApprovalsPage() {
   const [tab, setTab] = useState('scripts');
   const [items, setItems] = useState(ITEMS);
+
+  useEffect(() => {
+    api.get<typeof ITEMS>('/api/approvals').then(setItems).catch(() => {});
+  }, []);
 
   const approve = (id: number) => setItems(prev => {
     const next = { ...prev };
