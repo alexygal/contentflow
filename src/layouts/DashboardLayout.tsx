@@ -14,6 +14,7 @@ const BREADCRUMBS: Record<string, string> = {
   '/dashboard/approvals': 'Approvals',
   '/dashboard/settings': 'Settings',
   '/dashboard/profile': 'Edit Profile',
+  '/dashboard/team': 'Team Dashboard',
   '/admin': 'Admin Panel',
 };
 

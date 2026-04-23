@@ -33,6 +33,7 @@ import ApprovalsPage from './pages/dashboard/ApprovalsPage';
 import SettingsPage from './pages/dashboard/SettingsPage';
 import ProfilePage from './pages/dashboard/ProfilePage';
 import AdminPage from './pages/dashboard/AdminPage';
+import TeamDashboardPage from './pages/dashboard/TeamDashboardPage';
 
 export default function AppRouter() {
   return (
@@ -70,6 +71,7 @@ export default function AppRouter() {
             <Route path="approvals" element={<ApprovalsPage />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="profile" element={<ProfilePage />} />
+            <Route path="team" element={<TeamDashboardPage />} />
           </Route>
 
           {/* Admin — protected + role-gated inside AdminPage */}

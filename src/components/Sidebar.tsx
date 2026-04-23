@@ -14,6 +14,7 @@ import {
   Play,
   Settings,
   Shield,
+  Users,
   Video,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
@@ -32,6 +33,7 @@ const MAIN_ITEMS: NavItem[] = [
   { label: 'Partnerships', to: '/dashboard/partnerships', icon: <Briefcase className="h-4.5 w-4.5" /> },
   { label: 'Analytics',    to: '/dashboard/analytics',    icon: <BarChart2 className="h-4.5 w-4.5" /> },
   { label: 'Approvals',    to: '/dashboard/approvals',    icon: <CheckSquare className="h-4.5 w-4.5" />, badge: '5' },
+  { label: 'Team',         to: '/dashboard/team',         icon: <Users className="h-4.5 w-4.5" /> },
   { label: 'Settings',     to: '/dashboard/settings',     icon: <Settings className="h-4.5 w-4.5" /> },
 ];
 

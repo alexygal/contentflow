@@ -8,6 +8,7 @@ import userRoutes from './routes/user.routes';
 import contentRoutes from './routes/content.routes';
 import billingRoutes from './routes/billing.routes';
 import adminRoutes from './routes/admin.routes';
+import teamRoutes from './routes/team.routes';
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use('/api/users',   userRoutes);
 app.use('/api/content', contentRoutes);
 app.use('/api/billing', billingRoutes);
 app.use('/api/admin',   adminRoutes);
+app.use('/api/team',    teamRoutes);
 
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
 

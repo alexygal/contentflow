@@ -5,6 +5,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import LoginModal from './src/components/LoginModal';
 import {
   ArrowRight,
   Award,
@@ -375,6 +376,13 @@ const I18nContext = createContext<I18nCtx>({ lang: 'en', setLang: () => {}, t: t
 const useI18n = () => useContext(I18nContext);
 
 // ─────────────────────────────────────────────────────────────────────────────
+// LOGIN MODAL CONTEXT
+// ─────────────────────────────────────────────────────────────────────────────
+
+const LoginCtx = createContext<{ openLogin: () => void }>({ openLogin: () => {} });
+const useLogin = () => useContext(LoginCtx);
+
+// ─────────────────────────────────────────────────────────────────────────────
 // HOOKS
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -509,6 +517,7 @@ function EmailCapture({ placeholder, cta, sub }: { placeholder: string; cta: str
 
 function Navigation() {
   const { t, lang, setLang } = useI18n();
+  const { openLogin } = useLogin();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
@@ -586,6 +595,13 @@ function Navigation() {
             </div>
 
             <button
+              onClick={openLogin}
+              className="hidden sm:flex items-center px-4 py-2 text-sm font-medium text-slate-300 hover:text-white border border-white/10 hover:border-white/25 rounded-xl transition-all duration-200"
+            >
+              Login
+            </button>
+
+            <button
               onClick={() => scroll('cta')}
               className="hidden sm:flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-semibold text-white transition-all duration-200 hover:scale-[1.03]"
               style={{ background: 'linear-gradient(135deg, #2563EB, #EC4899)' }}
@@ -609,6 +625,9 @@ function Navigation() {
               {l.label}
             </button>
           ))}
+          <button onClick={openLogin} className="text-left px-4 py-3 text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors border border-white/8">
+            Login
+          </button>
           <button onClick={() => scroll('cta')} className="mt-2 rounded-xl px-4 py-3 text-sm font-semibold text-white text-center" style={{ background: 'linear-gradient(135deg, #2563EB, #EC4899)' }}>
             {t.nav.cta}
           </button>
@@ -1166,24 +1185,28 @@ export default function App() {
     } catch {}
     return 'en';
   });
+  const [loginOpen, setLoginOpen] = useState(false);
 
   const t = translations[lang] as unknown as typeof translations['en'];
 
   return (
     <I18nContext.Provider value={{ lang, setLang, t }}>
-      <div className="min-h-screen bg-[#0F172A] text-slate-100 antialiased" style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}>
-        <Navigation />
-        <main>
-          <HeroSection />
-          <FeaturesSection />
-          <HowItWorksSection />
-          <PricingSection />
-          <TestimonialsSection />
-          <FAQSection />
-          <CTASection />
-        </main>
-        <Footer />
-      </div>
+      <LoginCtx.Provider value={{ openLogin: () => setLoginOpen(true) }}>
+        <div className="min-h-screen bg-[#0F172A] text-slate-100 antialiased" style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}>
+          <Navigation />
+          <main>
+            <HeroSection />
+            <FeaturesSection />
+            <HowItWorksSection />
+            <PricingSection />
+            <TestimonialsSection />
+            <FAQSection />
+            <CTASection />
+          </main>
+          <Footer />
+          <LoginModal isOpen={loginOpen} onClose={() => setLoginOpen(false)} />
+        </div>
+      </LoginCtx.Provider>
     </I18nContext.Provider>
   );
 }
