@@ -27,21 +27,16 @@ const AuthContext = createContext<AuthCtx>({
   isAuthenticated: false,
 });
 
-const MOCK_USER: AuthUser = {
-  id: 'usr_01',
-  email: 'creator@contentflow.ai',
-  name: 'Alex Rivera',
-  role: 'creator',
-  tier: 'growth',
-};
-
-const MOCK_ADMIN: AuthUser = {
-  id: 'usr_admin',
-  email: 'admin@contentflow.ai',
-  name: 'Admin User',
-  role: 'admin',
-  tier: 'premium',
-};
+function devMockUser(email: string, name?: string, tier?: string): AuthUser {
+  const isAdmin = email.includes('admin');
+  return {
+    id: 'mock_' + Date.now(),
+    email,
+    name: name || (isAdmin ? 'Admin User' : email.split('@')[0]),
+    role: isAdmin ? 'admin' : 'creator',
+    tier: (tier as AuthUser['tier']) || (isAdmin ? 'premium' : 'growth'),
+  };
+}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -49,8 +44,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const stored = localStorage.getItem('cf_user');
-    if (stored) {
-      try { setUser(JSON.parse(stored)); } catch {}
+    const token = localStorage.getItem('cf_token');
+    if (stored && token) {
+      try { setUser(JSON.parse(stored)); } catch { localStorage.removeItem('cf_user'); localStorage.removeItem('cf_token'); }
     }
     setLoading(false);
   }, []);
@@ -73,11 +69,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw new Error(err.message || 'Invalid credentials');
     } catch (e) {
       if (!(e instanceof TypeError)) throw e;
-      // Network error — fall back to mock
-      const u = email.includes('admin') ? MOCK_ADMIN : MOCK_USER;
+      if (!import.meta.env.DEV) throw new Error('Unable to connect to server. Please try again.');
+      // Network error in DEV — fall back to dynamic mock
+      const u = devMockUser(email);
+      const token = 'mock_jwt_' + Date.now();
       setUser(u);
       localStorage.setItem('cf_user', JSON.stringify(u));
-      localStorage.setItem('cf_token', 'mock_jwt_token');
+      localStorage.setItem('cf_token', token);
     }
   };
 
@@ -99,11 +97,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw new Error(err.message || 'Signup failed');
     } catch (e) {
       if (!(e instanceof TypeError)) throw e;
-      // Network error — fall back to mock
-      const u: AuthUser = { id: 'usr_new', email, name, role: 'creator', tier: tier as AuthUser['tier'] };
+      if (!import.meta.env.DEV) throw new Error('Unable to connect to server. Please try again.');
+      // Network error in DEV — fall back to dynamic mock
+      const u = devMockUser(email, name, tier);
+      const token = 'mock_jwt_' + Date.now();
       setUser(u);
       localStorage.setItem('cf_user', JSON.stringify(u));
-      localStorage.setItem('cf_token', 'mock_jwt_token');
+      localStorage.setItem('cf_token', token);
     }
   };
 

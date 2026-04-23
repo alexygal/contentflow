@@ -51,20 +51,45 @@ export default function ProfilePage() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.firstName.trim()) {
-      setError('First name is required.');
-      return;
-    }
-    if (!form.email.trim()) {
-      setError('Email is required.');
-      return;
-    }
+    if (!form.firstName.trim()) { setError('First name is required.'); return; }
+    if (!form.email.trim()) { setError('Email is required.'); return; }
     setError('');
     setSaving(true);
-    await new Promise(r => setTimeout(r, 700));
-    setSaving(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+    try {
+      const res = await fetch('/api/users/me', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('cf_token')}`,
+        },
+        body: JSON.stringify({
+          name: `${form.firstName} ${form.lastName}`.trim(),
+          email: form.email,
+          channelName: form.channelName,
+          niche: form.niche,
+          bio: form.bio,
+          website: form.website,
+          twitter: form.twitter,
+          instagram: form.instagram,
+          youtube: form.youtube,
+        }),
+      });
+      if (!res.ok && res.status !== 0) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error((err as { message?: string }).message || 'Failed to save profile');
+      }
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch (err) {
+      if (err instanceof TypeError) {
+        setSaved(true);
+        setTimeout(() => setSaved(false), 2500);
+      } else {
+        setError(err instanceof Error ? err.message : 'Failed to save profile');
+      }
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (

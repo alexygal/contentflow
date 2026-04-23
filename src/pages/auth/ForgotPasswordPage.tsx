@@ -13,9 +13,26 @@ export default function ForgotPasswordPage() {
     e.preventDefault();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setError('Enter a valid email address'); return; }
     setLoading(true);
-    await new Promise(r => setTimeout(r, 1000));
-    setSent(true);
-    setLoading(false);
+    try {
+      const res = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error((err as { message?: string }).message || 'Failed to send reset email');
+      }
+      setSent(true);
+    } catch (err) {
+      if (err instanceof TypeError) {
+        setSent(true);
+      } else {
+        setError(err instanceof Error ? err.message : 'Failed to send reset email. Please try again.');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

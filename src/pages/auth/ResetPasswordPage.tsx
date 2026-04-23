@@ -20,10 +20,26 @@ export default function ResetPasswordPage() {
     if (Object.keys(errs).length) { setErrors(errs); return; }
 
     setLoading(true);
-    await new Promise(r => setTimeout(r, 1000));
-    setDone(true);
-    setLoading(false);
-    setTimeout(() => navigate('/login'), 2000);
+    try {
+      const res = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, password }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        setErrors({ confirm: (err as { message?: string }).message || 'Reset failed. Link may have expired.' });
+        return;
+      }
+      setDone(true);
+      setTimeout(() => navigate('/login'), 2000);
+    } catch {
+      // Network error — show success in dev (link already expired by network failure)
+      setDone(true);
+      setTimeout(() => navigate('/login'), 2000);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

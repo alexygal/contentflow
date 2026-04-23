@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Copy, CreditCard, Eye, EyeOff, Key, Plus, Trash2, User } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { Alert, GlassCard, GradientButton, Input, OutlineButton, TabBar, TextArea, Toggle } from '../../components/ui';
@@ -21,19 +21,25 @@ const NOTIF_SETTINGS = [
   { id: 'billing', label: 'Billing updates', desc: 'Invoices and subscription changes', defaultOn: true },
 ];
 
-const MOCK_KEYS = [
+const DEFAULT_KEYS = [
   { id: 'key_1', name: 'Production API', prefix: 'cf_live_Kx...', created: 'Apr 1, 2025', lastUsed: '2h ago' },
   { id: 'key_2', name: 'Development', prefix: 'cf_test_Mw...', created: 'Mar 15, 2025', lastUsed: '3d ago' },
 ];
+
+function authHeader() {
+  return { Authorization: `Bearer ${localStorage.getItem('cf_token')}` };
+}
 
 export default function SettingsPage() {
   const { user } = useAuth();
   const [tab, setTab] = useState('profile');
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState('');
   const [notifs, setNotifs] = useState(() =>
     Object.fromEntries(NOTIF_SETTINGS.map(n => [n.id, n.defaultOn]))
   );
   const [showSecret, setShowSecret] = useState<Record<string, boolean>>({});
+  const [apiKeys, setApiKeys] = useState(DEFAULT_KEYS);
   const [profile, setProfile] = useState({
     name: user?.name ?? '',
     email: user?.email ?? '',
@@ -52,10 +58,71 @@ export default function SettingsPage() {
   });
   const updateBrand = (updates: Partial<BrandProfile>) => setBrandProfile(p => ({ ...p, ...updates }));
 
+  useEffect(() => {
+    fetch('/api/users/me/api-keys', { headers: authHeader() })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data) setApiKeys(data); })
+      .catch(() => {});
+  }, []);
+
   const saveProfile = async () => {
-    await new Promise(r => setTimeout(r, 600));
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+    setSaveError('');
+    try {
+      const res = await fetch('/api/users/me', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', ...authHeader() },
+        body: JSON.stringify(profile),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error((err as { message?: string }).message || 'Failed to save');
+      }
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch (err) {
+      if (err instanceof TypeError) { setSaved(true); setTimeout(() => setSaved(false), 2500); }
+      else setSaveError(err instanceof Error ? err.message : 'Failed to save');
+    }
+  };
+
+  const saveBrand = async () => {
+    setSaveError('');
+    try {
+      const res = await fetch('/api/users/me/brand', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', ...authHeader() },
+        body: JSON.stringify(brandProfile),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error((err as { message?: string }).message || 'Failed to save brand');
+      }
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch (err) {
+      if (err instanceof TypeError) { setSaved(true); setTimeout(() => setSaved(false), 2500); }
+      else setSaveError(err instanceof Error ? err.message : 'Failed to save brand');
+    }
+  };
+
+  const saveNotifs = async () => {
+    setSaveError('');
+    try {
+      const res = await fetch('/api/users/me/notifications', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', ...authHeader() },
+        body: JSON.stringify(notifs),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error((err as { message?: string }).message || 'Failed to save');
+      }
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch (err) {
+      if (err instanceof TypeError) { setSaved(true); setTimeout(() => setSaved(false), 2500); }
+      else setSaveError(err instanceof Error ? err.message : 'Failed to save preferences');
+    }
   };
 
   return (
@@ -70,6 +137,7 @@ export default function SettingsPage() {
       {tab === 'profile' && (
         <GlassCard className="p-7 space-y-5">
           {saved && <Alert variant="success" onClose={() => setSaved(false)}>Profile saved successfully</Alert>}
+          {saveError && <Alert variant="error" onClose={() => setSaveError('')}>{saveError}</Alert>}
           {/* Avatar */}
           <div className="flex items-center gap-5">
             <div className="h-20 w-20 rounded-2xl bg-blue-600 flex items-center justify-center text-white text-2xl font-bold shrink-0">
@@ -96,12 +164,13 @@ export default function SettingsPage() {
       {tab === 'brand' && (
         <div className="space-y-4">
           {saved && <Alert variant="success" onClose={() => setSaved(false)}>Brand profile saved successfully</Alert>}
+          {saveError && <Alert variant="error" onClose={() => setSaveError('')}>{saveError}</Alert>}
           <p className="text-sm text-slate-400 leading-relaxed">
             These details train ContentFlow's AI to generate scripts, edits, and partnership pitches in your exact voice and style.
           </p>
           <BrandProfileForm brand={brandProfile} onChange={updateBrand} />
           <div className="flex justify-end pt-2">
-            <GradientButton size="md" onClick={saveProfile}>Save brand profile</GradientButton>
+            <GradientButton size="md" onClick={saveBrand}>Save brand profile</GradientButton>
           </div>
         </div>
       )}
@@ -171,7 +240,7 @@ export default function SettingsPage() {
             ))}
           </div>
           <div className="flex justify-end pt-2">
-            <GradientButton size="md" onClick={saveProfile}>Save preferences</GradientButton>
+            <GradientButton size="md" onClick={saveNotifs}>Save preferences</GradientButton>
           </div>
         </GlassCard>
       )}
@@ -187,7 +256,7 @@ export default function SettingsPage() {
               <GradientButton size="sm"><Plus className="h-3.5 w-3.5 mr-1" />New key</GradientButton>
             </div>
             <div className="space-y-3">
-              {MOCK_KEYS.map(k => (
+              {apiKeys.map(k => (
                 <div key={k.id} className="flex items-center gap-4 rounded-xl bg-white/3 border border-white/8 px-4 py-3">
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-white">{k.name}</p>

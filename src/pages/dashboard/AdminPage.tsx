@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Activity, AlertTriangle, CheckCircle, CreditCard, Database, Mail, Search, Server, Shield, TrendingUp, Users } from 'lucide-react';
 import { GlassCard, OutlineButton, StatCard, StatusPill, TabBar } from '../../components/ui';
 import { useAuth } from '../../contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
 
-const USERS_DATA = [
+const MOCK_USERS_DATA = [
   { id: 'usr_01', name: 'Alex Rivera', email: 'alex@contentflow.ai', tier: 'growth', status: 'active', joined: 'Jan 12, 2025', revenue: '€2,500' },
   { id: 'usr_02', name: 'Sofia Rodriguez', email: 'sofia@tiktok.com', tier: 'growth', status: 'active', joined: 'Feb 3, 2025', revenue: '€2,500' },
   { id: 'usr_03', name: 'Marcus Chen', email: 'marcus@youtube.com', tier: 'premium', status: 'active', joined: 'Nov 20, 2024', revenue: '€5,000' },
@@ -15,7 +15,7 @@ const USERS_DATA = [
   { id: 'usr_08', name: 'Raj Patel', email: 'raj@agency.in', tier: 'premium', status: 'active', joined: 'Dec 5, 2024', revenue: '€5,000' },
 ];
 
-const HEALTH = [
+const MOCK_HEALTH = [
   { name: 'API Server', status: 'operational', latency: '48ms', uptime: '99.98%', icon: <Server className="h-4 w-4" /> },
   { name: 'Database', status: 'operational', latency: '12ms', uptime: '99.99%', icon: <Database className="h-4 w-4" /> },
   { name: 'Email Service', status: 'operational', latency: '220ms', uptime: '99.95%', icon: <Mail className="h-4 w-4" /> },
@@ -23,7 +23,7 @@ const HEALTH = [
   { name: 'Storage', status: 'operational', latency: '95ms', uptime: '99.97%', icon: <Database className="h-4 w-4" /> },
 ];
 
-const PAYMENTS = [
+const MOCK_PAYMENTS = [
   { user: 'Marcus Chen', amount: '€5,000', date: 'Apr 1, 2025', plan: 'Premium', status: 'succeeded' },
   { user: 'Alex Rivera', amount: '€2,500', date: 'Apr 1, 2025', plan: 'Growth', status: 'succeeded' },
   { user: 'Raj Patel', amount: '€5,000', date: 'Apr 1, 2025', plan: 'Premium', status: 'succeeded' },
@@ -55,10 +55,28 @@ export default function AdminPage() {
   const { user } = useAuth();
   const [tab, setTab] = useState('overview');
   const [search, setSearch] = useState('');
+  const [usersData, setUsersData] = useState(MOCK_USERS_DATA);
+  const [health, setHealth] = useState(MOCK_HEALTH);
+  const [payments, setPayments] = useState(MOCK_PAYMENTS);
+
+  useEffect(() => {
+    if (user?.role !== 'admin') return;
+    const token = localStorage.getItem('cf_token');
+    const headers = { Authorization: `Bearer ${token}` };
+    Promise.all([
+      fetch('/api/admin/users', { headers }).then(r => r.ok ? r.json() : null),
+      fetch('/api/admin/health', { headers }).then(r => r.ok ? r.json() : null),
+      fetch('/api/admin/payments', { headers }).then(r => r.ok ? r.json() : null),
+    ]).then(([users, hlth, pmts]) => {
+      if (users) setUsersData(users);
+      if (hlth) setHealth(hlth);
+      if (pmts) setPayments(pmts);
+    }).catch(() => {});
+  }, [user?.role]);
 
   if (user?.role !== 'admin') return <Navigate to="/dashboard" replace />;
 
-  const filteredUsers = USERS_DATA.filter(u =>
+  const filteredUsers = usersData.filter(u =>
     !search ||
     u.name.toLowerCase().includes(search.toLowerCase()) ||
     u.email.toLowerCase().includes(search.toLowerCase())
@@ -218,7 +236,7 @@ export default function AdminPage() {
                 </tr>
               </thead>
               <tbody>
-                {PAYMENTS.map((p, i) => (
+                {payments.map((p, i) => (
                   <tr key={i} className="border-b border-white/5 hover:bg-white/2 transition-colors">
                     <td className="px-5 py-3.5 text-sm text-white">{p.user}</td>
                     <td className="px-5 py-3.5 text-sm font-bold text-white">{p.amount}</td>
@@ -241,7 +259,7 @@ export default function AdminPage() {
       {tab === 'health' && (
         <div className="space-y-4">
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {HEALTH.map(h => (
+            {health.map(h => (
               <GlassCard key={h.name} className="p-5">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2.5 text-slate-300">
