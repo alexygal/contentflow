@@ -72,7 +72,7 @@ export default function HelpPage() {
     <div className="bg-[#0F172A]">
       {/* Hero */}
       <section className="py-20 lg:py-28 relative">
-        <div className="absolute inset-0 opacity-8" style={{ background: 'radial-gradient(ellipse at 50% 40%, #2563EB, transparent 55%)' }} />
+        <div className="absolute inset-0 opacity-10" style={{ background: 'radial-gradient(ellipse at 50% 40%, #2563EB, transparent 55%)' }} />
         <div className="max-w-3xl mx-auto px-4 text-center relative">
           <Fade><Badge pulse variant="blue">Help Center</Badge></Fade>
           <Fade delay={80}><h1 className="mt-5 text-5xl font-extrabold text-white">How can we help?</h1></Fade>

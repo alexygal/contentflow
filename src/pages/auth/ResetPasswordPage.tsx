@@ -30,7 +30,7 @@ export default function ResetPasswordPage() {
     <div className="w-full max-w-md">
       <div className="text-center mb-8">
         <h1 className="text-2xl font-bold text-white mb-2">Reset your password</h1>
-        <p className="text-slate-400 text-sm">Token: <code className="text-blue-400">{token?.slice(0, 8)}...</code></p>
+        <p className="text-slate-400 text-sm">Enter your new password below.</p>
       </div>
 
       <GlassCard className="p-8">

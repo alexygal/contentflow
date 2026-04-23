@@ -54,7 +54,7 @@ export default function PricingPage() {
     <div className="bg-[#0F172A]">
       {/* Hero */}
       <section className="py-20 lg:py-28 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-8" style={{ background: 'radial-gradient(ellipse at 50% 60%, #2563EB, transparent 60%)' }} />
+        <div className="absolute inset-0 opacity-10" style={{ background: 'radial-gradient(ellipse at 50% 60%, #2563EB, transparent 60%)' }} />
         <div className="max-w-3xl mx-auto px-4 text-center relative">
           <Fade><Badge pulse variant="blue">Transparent Pricing</Badge></Fade>
           <Fade delay={80}>

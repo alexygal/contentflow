@@ -76,7 +76,7 @@ function PublicFooter() {
           ))}
         </div>
         <div className="border-t border-white/5 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-slate-600 text-sm">© 2025 ContentFlow. All rights reserved.</p>
+          <p className="text-slate-600 text-sm">© 2026 ContentFlow. All rights reserved.</p>
           <p className="text-slate-700 text-xs">Made with ♥ for creators worldwide</p>
         </div>
       </div>

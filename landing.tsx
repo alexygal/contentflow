@@ -55,7 +55,7 @@ const translations = {
       cta: 'Start Free Trial',
     },
     hero: {
-      badge: '✦ AI Content Operations Platform',
+      badge: '✦ AI Content Operations Manager',
       headline: 'Your AI Content Operations Manager.',
       headlineAccent: 'We handle everything.',
       sub: 'Scripts written. Videos edited. Posts scheduled. Partnerships found. Revenue tracked. You approve. We execute. You focus on creating.',

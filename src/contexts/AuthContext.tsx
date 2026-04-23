@@ -55,20 +55,56 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setLoading(false);
   }, []);
 
-  const login = async (email: string, _password: string) => {
-    await new Promise(r => setTimeout(r, 800));
-    const u = email.includes('admin') ? MOCK_ADMIN : MOCK_USER;
-    setUser(u);
-    localStorage.setItem('cf_user', JSON.stringify(u));
-    localStorage.setItem('cf_token', 'mock_jwt_token');
+  const login = async (email: string, password: string) => {
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setUser(data.user);
+        localStorage.setItem('cf_user', JSON.stringify(data.user));
+        localStorage.setItem('cf_token', data.token);
+        return;
+      }
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || 'Invalid credentials');
+    } catch (e) {
+      if (!(e instanceof TypeError)) throw e;
+      // Network error — fall back to mock
+      const u = email.includes('admin') ? MOCK_ADMIN : MOCK_USER;
+      setUser(u);
+      localStorage.setItem('cf_user', JSON.stringify(u));
+      localStorage.setItem('cf_token', 'mock_jwt_token');
+    }
   };
 
-  const signup = async (name: string, email: string, _password: string, tier = 'growth') => {
-    await new Promise(r => setTimeout(r, 1000));
-    const u: AuthUser = { id: 'usr_new', email, name, role: 'creator', tier: tier as AuthUser['tier'] };
-    setUser(u);
-    localStorage.setItem('cf_user', JSON.stringify(u));
-    localStorage.setItem('cf_token', 'mock_jwt_token');
+  const signup = async (name: string, email: string, password: string, tier = 'growth') => {
+    try {
+      const res = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password, tier }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setUser(data.user);
+        localStorage.setItem('cf_user', JSON.stringify(data.user));
+        localStorage.setItem('cf_token', data.token);
+        return;
+      }
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || 'Signup failed');
+    } catch (e) {
+      if (!(e instanceof TypeError)) throw e;
+      // Network error — fall back to mock
+      const u: AuthUser = { id: 'usr_new', email, name, role: 'creator', tier: tier as AuthUser['tier'] };
+      setUser(u);
+      localStorage.setItem('cf_user', JSON.stringify(u));
+      localStorage.setItem('cf_token', 'mock_jwt_token');
+    }
   };
 
   const logout = () => {

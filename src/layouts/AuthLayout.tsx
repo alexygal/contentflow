@@ -29,7 +29,7 @@ export default function AuthLayout() {
       </main>
 
       <footer className="relative z-10 py-6 text-center">
-        <p className="text-slate-600 text-xs">© 2025 ContentFlow · <Link to="#" className="hover:text-slate-400">Privacy</Link> · <Link to="#" className="hover:text-slate-400">Terms</Link></p>
+        <p className="text-slate-600 text-xs">© 2026 ContentFlow · <Link to="#" className="hover:text-slate-400">Privacy</Link> · <Link to="#" className="hover:text-slate-400">Terms</Link></p>
       </footer>
     </PageWrapper>
   );

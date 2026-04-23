@@ -80,7 +80,7 @@ export default function BlogPage() {
     <div className="bg-[#0F172A]">
       {/* Hero */}
       <section className="py-16 lg:py-24 relative">
-        <div className="absolute inset-0 opacity-8" style={{ background: 'radial-gradient(ellipse at 30% 50%, #2563EB, transparent 60%)' }} />
+        <div className="absolute inset-0 opacity-10" style={{ background: 'radial-gradient(ellipse at 30% 50%, #2563EB, transparent 60%)' }} />
         <div className="max-w-4xl mx-auto px-4 relative">
           <Fade><Badge pulse variant="blue">ContentFlow Blog</Badge></Fade>
           <Fade delay={80}>
@@ -106,7 +106,7 @@ export default function BlogPage() {
                   value={search}
                   onChange={e => setSearch(e.target.value)}
                   placeholder="Search articles..."
-                  className="w-full rounded-xl border border-slate-600 bg-[#1e293b] pl-10 pr-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                  className="w-full rounded-xl border border-slate-600 bg-[#1e293b] pl-10 pr-4 py-3 text-sm text-white placeholder:text-slate-400 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
                 />
               </div>
               <div className="flex gap-2 flex-wrap">
@@ -176,7 +176,7 @@ export default function BlogPage() {
             <h2 className="text-3xl font-bold text-white mb-3">Stay ahead of the curve</h2>
             <p className="text-slate-400 mb-6 text-sm">Weekly insights on AI, content creation, and the creator economy. No spam.</p>
             <div className="flex gap-2">
-              <input placeholder="your@email.com" className="flex-1 rounded-xl border border-slate-600 bg-[#1e293b] px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all" />
+              <input placeholder="your@email.com" className="flex-1 rounded-xl border border-slate-600 bg-[#1e293b] px-4 py-3 text-sm text-white placeholder:text-slate-400 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all" />
               <GradientButton size="md">Subscribe <ArrowRight className="h-4 w-4" /></GradientButton>
             </div>
           </Fade>

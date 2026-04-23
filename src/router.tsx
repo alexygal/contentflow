@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 
 import PublicLayout from './layouts/PublicLayout';
 import AuthLayout from './layouts/AuthLayout';
@@ -76,8 +77,8 @@ export default function AppRouter() {
             <Route index element={<AdminPage />} />
           </Route>
 
-          {/* Post-signup brand setup — standalone, no layout wrapper */}
-          <Route path="/auth/complete-profile" element={<CompleteProfilePage />} />
+          {/* Post-signup brand setup — requires auth, no layout wrapper */}
+          <Route path="/auth/complete-profile" element={<ProtectedRoute><CompleteProfilePage /></ProtectedRoute>} />
 
           {/* Catch-all */}
           <Route path="*" element={<Navigate to="/" replace />} />

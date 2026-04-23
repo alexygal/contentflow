@@ -2,27 +2,40 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import BrandProfileForm, { BrandProfile, defaultBrandProfile } from '../../components/BrandProfileForm';
+import { Alert } from '../../components/ui';
 
 export default function CompleteProfilePage() {
   const navigate = useNavigate();
   const [brand, setBrand] = useState<BrandProfile>(defaultBrandProfile);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
 
   const update = (updates: Partial<BrandProfile>) => setBrand(prev => ({ ...prev, ...updates }));
 
   const handleSave = async () => {
     setSaving(true);
+    setError('');
     try {
-      await fetch('/api/user/me/brand', {
+      const res = await fetch('/api/users/me/brand', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem('cf_token')}`,
         },
         body: JSON.stringify({ brand_profile: brand }),
-      }).catch(() => {});
-      await new Promise(r => setTimeout(r, 600));
+      }).catch(() => null);
+      if (res && !res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.message || 'Failed to save brand profile.');
+      }
       navigate('/dashboard');
+    } catch (err) {
+      if (err instanceof TypeError) {
+        navigate('/dashboard');
+      } else {
+        setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+        setSaving(false);
+      }
     } finally {
       setSaving(false);
     }
@@ -79,6 +92,8 @@ export default function CompleteProfilePage() {
             ))}
           </div>
         </div>
+
+        {error && <Alert variant="error" onClose={() => setError('')} className="mb-6">{error}</Alert>}
 
         {/* The comprehensive form */}
         <BrandProfileForm brand={brand} onChange={update} />

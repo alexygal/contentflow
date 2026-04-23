@@ -11,7 +11,7 @@ export default function VerifyEmailPage() {
   useEffect(() => {
     const verify = async () => {
       await new Promise(r => setTimeout(r, 1500));
-      if (token && token.length > 5) {
+      if (token && token.length >= 32 && /^[a-zA-Z0-9]+$/.test(token)) {
         setStatus('success');
         setTimeout(() => navigate('/dashboard'), 3000);
       } else {

@@ -112,7 +112,7 @@ export const defaultBrandProfile: BrandProfile = {
 
 // ─── Helper Components ──────────────────────────────────────────────────────────
 
-const inputCls = 'w-full bg-[#0f172a] border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all';
+const inputCls = 'w-full bg-[#1e293b] border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all';
 const textareaCls = `${inputCls} resize-none`;
 
 function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
@@ -135,7 +135,7 @@ function Sel({ label, value, onChange, options, hint }: {
         <select
           value={value}
           onChange={e => onChange(e.target.value)}
-          className="w-full bg-[#0f172a] border border-gray-700 rounded-xl px-4 py-2.5 pr-9 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all appearance-none cursor-pointer"
+          className="w-full bg-[#1e293b] border border-gray-700 rounded-xl px-4 py-2.5 pr-9 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all appearance-none cursor-pointer"
         >
           <option value="">Select…</option>
           {options.map(o => <option key={o} value={o}>{o}</option>)}
@@ -158,7 +158,7 @@ function CheckGroup({ options, values, onChange }: { options: string[]; values: 
           className={`flex items-center gap-2 cursor-pointer rounded-lg border px-3 py-1.5 text-xs transition-colors ${
             values.includes(opt)
               ? 'border-blue-500/60 bg-blue-600/10 text-blue-300'
-              : 'border-gray-700 bg-[#0f172a] text-slate-300 hover:border-gray-600'
+              : 'border-gray-700 bg-[#1e293b] text-slate-300 hover:border-gray-600'
           }`}
         >
           <input
@@ -178,7 +178,7 @@ function ColorPicker({ label, value, onChange }: { label: string; value: string;
   return (
     <div className="flex flex-col gap-1.5">
       <label className="text-xs font-medium text-slate-400">{label}</label>
-      <div className="flex items-center gap-3 rounded-xl border border-gray-700 bg-[#0f172a] px-3 py-2">
+      <div className="flex items-center gap-3 rounded-xl border border-gray-700 bg-[#1e293b] px-3 py-2">
         <label className="relative cursor-pointer shrink-0">
           <div className="h-7 w-7 rounded-lg border border-white/20 shadow-inner" style={{ background: value || '#000000' }} />
           <input
@@ -192,7 +192,7 @@ function ColorPicker({ label, value, onChange }: { label: string; value: string;
           type="text"
           value={value}
           onChange={e => onChange(e.target.value)}
-          className="flex-1 bg-transparent text-white text-sm outline-none font-mono placeholder:text-slate-500"
+          className="flex-1 bg-transparent text-white text-sm outline-none font-mono placeholder:text-slate-400"
           placeholder="#000000"
           maxLength={7}
         />
@@ -392,7 +392,7 @@ export default function BrandProfileForm({ brand, onChange }: BrandProfileFormPr
           { label: 'Brand guidelines document', hint: 'PDF or DOCX (optional)' },
           { label: 'Brand font files', hint: 'TTF or OTF (optional)' },
         ].map(({ label, hint }) => (
-          <div key={label} className="flex items-center gap-4 rounded-xl border border-dashed border-gray-700 bg-[#0f172a] px-5 py-4">
+          <div key={label} className="flex items-center gap-4 rounded-xl border border-dashed border-gray-700 bg-[#1e293b] px-5 py-4">
             <Upload className="h-5 w-5 text-slate-600 shrink-0" />
             <div className="flex-1 min-w-0">
               <p className="text-sm text-slate-400">{label}</p>
