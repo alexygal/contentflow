@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import BrandProfileForm, { BrandProfile, defaultBrandProfile } from '../../components/BrandProfileForm';
+import { api } from '../../utils/api';
 import { Alert } from '../../components/ui';
 
 export default function CompleteProfilePage() {
@@ -16,26 +17,10 @@ export default function CompleteProfilePage() {
     setSaving(true);
     setError('');
     try {
-      const res = await fetch('/api/users/me/brand', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('cf_token')}`,
-        },
-        body: JSON.stringify({ brand_profile: brand }),
-      }).catch(() => null);
-      if (res && !res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.message || 'Failed to save brand profile.');
-      }
+      await api.put('/api/users/me/brand', { brand_profile: brand });
       navigate('/dashboard');
     } catch (err) {
-      if (err instanceof TypeError) {
-        navigate('/dashboard');
-      } else {
-        setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
-        setSaving(false);
-      }
+      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
     } finally {
       setSaving(false);
     }

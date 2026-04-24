@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { AlertCircle, CheckCircle, Plus, Trash2 } from 'lucide-react';
+import { api } from '../../utils/api';
 import { Alert, GlassCard, GradientButton, OutlineButton } from '../../components/ui';
 
 interface Project {
@@ -65,10 +66,6 @@ const STATUS_COLORS: Record<ProspectItem['status'], string> = {
   Rejected: 'bg-red-500/20 text-red-300',
 };
 
-function authHeader() {
-  return { Authorization: `Bearer ${localStorage.getItem('cf_token')}` };
-}
-
 export default function TeamDashboardPage() {
   const [data, setData] = useState<DashboardData>(MOCK_DATA);
   const [saved, setSaved] = useState(false);
@@ -76,8 +73,7 @@ export default function TeamDashboardPage() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    fetch('/api/team/dashboard', { headers: authHeader() })
-      .then(r => r.ok ? r.json() : null)
+    api.get<DashboardData>('/api/team/dashboard')
       .then(d => { if (d) setData(d); })
       .catch(() => {});
   }, []);
@@ -86,15 +82,7 @@ export default function TeamDashboardPage() {
     setSaving(true);
     setSaveError('');
     try {
-      const res = await fetch('/api/team/dashboard', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...authHeader() },
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error((err as { message?: string }).message || 'Failed to save');
-      }
+      await api.post('/api/team/dashboard', data);
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
     } catch (err) {

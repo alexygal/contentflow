@@ -1,42 +1,33 @@
-import { Router, Request, Response } from 'express';
-import { authenticate } from '../middleware/auth.middleware';
+import { Router, Response, NextFunction } from 'express';
+import { authenticate, AuthRequest } from '../middleware/auth.middleware';
+import pool from '../config/db';
 
 const router = Router();
 
 router.use(authenticate);
 
-router.get('/dashboard', async (req: Request, res: Response) => {
+router.get('/dashboard', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const { db } = req.app.locals;
-    if (!db) return res.status(503).json({ message: 'Database not available' });
-
-    const result = await db.query(
+    const userId = req.user!.sub;
+    const { rows } = await pool.query(
       'SELECT data FROM team_dashboard WHERE user_id = $1',
-      [(req as any).user.id]
+      [userId]
     );
-    if (result.rows.length === 0) return res.json(null);
-    res.json(result.rows[0].data);
-  } catch {
-    res.status(500).json({ message: 'Failed to load team dashboard' });
-  }
+    res.json(rows[0]?.data ?? null);
+  } catch (err) { next(err); }
 });
 
-router.post('/dashboard', async (req: Request, res: Response) => {
+router.post('/dashboard', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const { db } = req.app.locals;
-    if (!db) return res.status(503).json({ message: 'Database not available' });
-
-    const userId = (req as any).user.id;
-    await db.query(
+    const userId = req.user!.sub;
+    await pool.query(
       `INSERT INTO team_dashboard (user_id, data, updated_at)
        VALUES ($1, $2, NOW())
        ON CONFLICT (user_id) DO UPDATE SET data = $2, updated_at = NOW()`,
       [userId, JSON.stringify(req.body)]
     );
     res.json({ success: true });
-  } catch {
-    res.status(500).json({ message: 'Failed to save team dashboard' });
-  }
+  } catch (err) { next(err); }
 });
 
 export default router;

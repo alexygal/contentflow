@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Copy, CreditCard, Eye, EyeOff, Key, Plus, Trash2, User } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { api } from '../../utils/api';
 import { Alert, GlassCard, GradientButton, Input, OutlineButton, TabBar, TextArea, Toggle } from '../../components/ui';
 import BrandProfileForm, { BrandProfile, defaultBrandProfile } from '../../components/BrandProfileForm';
 
@@ -25,10 +26,6 @@ const DEFAULT_KEYS = [
   { id: 'key_1', name: 'Production API', prefix: 'cf_live_Kx...', created: 'Apr 1, 2025', lastUsed: '2h ago' },
   { id: 'key_2', name: 'Development', prefix: 'cf_test_Mw...', created: 'Mar 15, 2025', lastUsed: '3d ago' },
 ];
-
-function authHeader() {
-  return { Authorization: `Bearer ${localStorage.getItem('cf_token')}` };
-}
 
 export default function SettingsPage() {
   const { user } = useAuth();
@@ -65,80 +62,52 @@ export default function SettingsPage() {
   const updateBrand = (updates: Partial<BrandProfile>) => setBrandProfile(p => ({ ...p, ...updates }));
 
   useEffect(() => {
-    fetch('/api/users/me/api-keys', { headers: authHeader() })
-      .then(r => r.ok ? r.json() : null)
-      .then(data => { if (data) setApiKeys(data); })
+    api.get<typeof DEFAULT_KEYS>('/api/users/me/api-keys')
+      .then(data => setApiKeys(data))
       .catch(() => {});
   }, []);
 
   useEffect(() => {
     if (tab !== 'billing') return;
     Promise.all([
-      fetch('/api/billing/subscription', { headers: authHeader() }).then(r => r.ok ? r.json() : null),
-      fetch('/api/billing/invoices', { headers: authHeader() }).then(r => r.ok ? r.json() : null),
+      api.get<typeof billing>('/api/billing/subscription').catch(() => null),
+      api.get<typeof invoices>('/api/billing/invoices').catch(() => null),
     ]).then(([sub, invs]) => {
       if (sub) setBilling(sub);
       if (invs) setInvoices(invs);
-    }).catch(() => {});
+    });
   }, [tab]);
 
   const saveProfile = async () => {
     setSaveError('');
     try {
-      const res = await fetch('/api/users/me', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', ...authHeader() },
-        body: JSON.stringify(profile),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error((err as { message?: string }).message || 'Failed to save');
-      }
+      await api.patch('/api/users/me', profile);
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
     } catch (err) {
-      if (err instanceof TypeError) { setSaved(true); setTimeout(() => setSaved(false), 2500); }
-      else setSaveError(err instanceof Error ? err.message : 'Failed to save');
+      setSaveError(err instanceof Error ? err.message : 'Failed to save');
     }
   };
 
   const saveBrand = async () => {
     setSaveError('');
     try {
-      const res = await fetch('/api/users/me/brand', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', ...authHeader() },
-        body: JSON.stringify(brandProfile),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error((err as { message?: string }).message || 'Failed to save brand');
-      }
+      await api.put('/api/users/me/brand', { brand_profile: brandProfile });
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
     } catch (err) {
-      if (err instanceof TypeError) { setSaved(true); setTimeout(() => setSaved(false), 2500); }
-      else setSaveError(err instanceof Error ? err.message : 'Failed to save brand');
+      setSaveError(err instanceof Error ? err.message : 'Failed to save brand');
     }
   };
 
   const saveNotifs = async () => {
     setSaveError('');
     try {
-      const res = await fetch('/api/users/me/notifications', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', ...authHeader() },
-        body: JSON.stringify(notifs),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error((err as { message?: string }).message || 'Failed to save');
-      }
+      await api.put('/api/users/me/notifications', notifs);
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
     } catch (err) {
-      if (err instanceof TypeError) { setSaved(true); setTimeout(() => setSaved(false), 2500); }
-      else setSaveError(err instanceof Error ? err.message : 'Failed to save preferences');
+      setSaveError(err instanceof Error ? err.message : 'Failed to save preferences');
     }
   };
 

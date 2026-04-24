@@ -34,7 +34,7 @@ export async function handleWebhook(req: AuthRequest, res: Response, next: NextF
   try {
     const sig = req.headers['stripe-signature'] as string;
     const event = stripe.webhooks.constructEvent(
-      (req as unknown as { rawBody: Buffer }).rawBody,
+      req.body as Buffer,
       sig,
       process.env.STRIPE_WEBHOOK_SECRET!
     );
@@ -53,6 +53,29 @@ export async function handleWebhook(req: AuthRequest, res: Response, next: NextF
     }
 
     res.json({ received: true });
+  } catch (err) { next(err); }
+}
+
+export async function getSubscription(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const { rows } = await pool.query(
+      'SELECT tier, updated_at FROM users WHERE id = $1',
+      [req.user!.sub]
+    );
+    if (!rows[0]) { res.status(404).json({ error: 'User not found' }); return; }
+    const tierPrices: Record<string, string> = {
+      starter: '€500/month',
+      growth: '€2,500/month',
+      premium: '€5,000/month',
+    };
+    const tier = rows[0].tier as string;
+    const nextDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+      .toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    res.json({
+      plan: tier.charAt(0).toUpperCase() + tier.slice(1),
+      price: tierPrices[tier] ?? '€0/month',
+      nextDate,
+    });
   } catch (err) { next(err); }
 }
 

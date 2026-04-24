@@ -146,3 +146,13 @@ BEGIN
     ', tbl, tbl);
   END LOOP;
 END $$;
+
+-- ── Team Dashboard ────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS team_dashboard (
+  user_id    UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  data       JSONB        NOT NULL DEFAULT '{}'::jsonb,
+  updated_at TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_team_dashboard_user_id ON team_dashboard(user_id);

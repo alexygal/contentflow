@@ -28,13 +28,12 @@ const AuthContext = createContext<AuthCtx>({
 });
 
 function devMockUser(email: string, name?: string, tier?: string): AuthUser {
-  const isAdmin = email.includes('admin');
   return {
     id: 'mock_' + Date.now(),
     email,
-    name: name || (isAdmin ? 'Admin User' : email.split('@')[0]),
-    role: isAdmin ? 'admin' : 'creator',
-    tier: (tier as AuthUser['tier']) || (isAdmin ? 'premium' : 'growth'),
+    name: name || email.split('@')[0],
+    role: 'creator',
+    tier: (tier as AuthUser['tier']) || 'growth',
   };
 }
 
