@@ -40,6 +40,12 @@ export default function SettingsPage() {
   );
   const [showSecret, setShowSecret] = useState<Record<string, boolean>>({});
   const [apiKeys, setApiKeys] = useState(DEFAULT_KEYS);
+  const [billing, setBilling] = useState({ plan: 'Growth', price: '€2,500/month', nextDate: 'May 1, 2026' });
+  const [invoices, setInvoices] = useState([
+    { date: 'Apr 1, 2026', amount: '€2,500', status: 'Paid' },
+    { date: 'Mar 1, 2026', amount: '€2,500', status: 'Paid' },
+    { date: 'Feb 1, 2026', amount: '€2,500', status: 'Paid' },
+  ]);
   const [profile, setProfile] = useState({
     name: user?.name ?? '',
     email: user?.email ?? '',
@@ -64,6 +70,17 @@ export default function SettingsPage() {
       .then(data => { if (data) setApiKeys(data); })
       .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (tab !== 'billing') return;
+    Promise.all([
+      fetch('/api/billing/subscription', { headers: authHeader() }).then(r => r.ok ? r.json() : null),
+      fetch('/api/billing/invoices', { headers: authHeader() }).then(r => r.ok ? r.json() : null),
+    ]).then(([sub, invs]) => {
+      if (sub) setBilling(sub);
+      if (invs) setInvoices(invs);
+    }).catch(() => {});
+  }, [tab]);
 
   const saveProfile = async () => {
     setSaveError('');
@@ -181,8 +198,8 @@ export default function SettingsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-blue-300 text-xs font-semibold uppercase tracking-wide mb-1">Current plan</p>
-                <h3 className="text-white font-bold text-xl">Growth — €2,500/month</h3>
-                <p className="text-slate-400 text-sm mt-1">Next billing date: May 1, 2025</p>
+                <h3 className="text-white font-bold text-xl">{billing.plan} — {billing.price}</h3>
+                <p className="text-slate-400 text-sm mt-1">Next billing date: {billing.nextDate}</p>
               </div>
               <div className="text-right">
                 <div className="flex flex-col gap-2">
@@ -208,11 +225,7 @@ export default function SettingsPage() {
           <GlassCard className="p-6">
             <h3 className="text-white font-semibold mb-4">Invoice history</h3>
             <div className="space-y-2">
-              {[
-                { date: 'Apr 1, 2025', amount: '€2,500', status: 'Paid' },
-                { date: 'Mar 1, 2025', amount: '€2,500', status: 'Paid' },
-                { date: 'Feb 1, 2025', amount: '€2,500', status: 'Paid' },
-              ].map((inv, i) => (
+              {invoices.map((inv, i) => (
                 <div key={i} className="flex items-center justify-between py-2.5 border-b border-white/5">
                   <span className="text-sm text-slate-300">{inv.date}</span>
                   <span className="text-sm font-medium text-white">{inv.amount}</span>

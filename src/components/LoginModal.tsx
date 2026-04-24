@@ -122,13 +122,15 @@ export default function LoginModal({ isOpen, onClose }: Props) {
           </p>
         </form>
 
-        <div className="mt-6 pt-5 border-t border-slate-700/60">
-          <p className="text-xs text-slate-600 mb-2">Demo credentials:</p>
-          <div className="bg-[#0f172a] rounded-xl px-3 py-2.5 text-xs text-slate-500 space-y-1">
-            <p>creator@contentflow.ai / password123</p>
-            <p>admin@contentflow.ai / password123</p>
+        {import.meta.env.DEV && (
+          <div className="mt-6 pt-5 border-t border-slate-700/60">
+            <p className="text-xs text-slate-600 mb-2">Demo credentials:</p>
+            <div className="bg-[#0f172a] rounded-xl px-3 py-2.5 text-xs text-slate-500 space-y-1">
+              <p>creator@contentflow.ai / password123</p>
+              <p>admin@contentflow.ai / password123</p>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

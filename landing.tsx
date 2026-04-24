@@ -178,7 +178,7 @@ const translations = {
   fr: {
     nav: { features: 'Fonctionnalités', pricing: 'Tarifs', howItWorks: 'Comment ça marche', faq: 'FAQ', cta: 'Essai gratuit' },
     hero: {
-      badge: '✦ Plateforme IA de gestion de contenu',
+      badge: '✦ Gestionnaire IA de Contenu',
       headline: 'Votre gestionnaire de contenu piloté par IA.',
       headlineAccent: 'Nous gérons tout.',
       sub: "Scripts rédigés. Vidéos montées. Posts programmés. Partenariats trouvés. Revenus suivis. Vous approuvez. Nous exécutons. Vous créez.",
@@ -272,7 +272,7 @@ const translations = {
   es: {
     nav: { features: 'Características', pricing: 'Precios', howItWorks: 'Cómo funciona', faq: 'FAQ', cta: 'Prueba gratuita' },
     hero: {
-      badge: '✦ Plataforma IA de operaciones de contenido',
+      badge: '✦ Gestor IA de Operaciones de Contenido',
       headline: 'Tu gestor de operaciones de contenido con IA.',
       headlineAccent: 'Nosotros gestionamos todo.',
       sub: 'Scripts redactados. Videos editados. Posts programados. Partnerships encontrados. Ingresos rastreados. Tú apruebas. Nosotros ejecutamos. Tú creas.',
