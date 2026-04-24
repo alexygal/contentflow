@@ -55,7 +55,7 @@ export async function login(req: Request, res: Response, next: NextFunction): Pr
 
 export async function verifyEmail(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const { token } = req.params;
+    const token = req.params['token'] as string;
     const hash = crypto.createHash('sha256').update(token).digest('hex');
 
     const { rows } = await pool.query(

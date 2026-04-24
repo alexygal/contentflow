@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import { authenticate } from '../middleware/auth.middleware';
+import { validate } from '../middleware/validate';
+import { profileUpdateSchema } from '../utils/validators';
 import {
   getMe,
   updateMe,
@@ -14,7 +16,7 @@ const router = Router();
 router.use(authenticate);
 
 router.get('/me', getMe);
-router.patch('/me', updateMe);
+router.patch('/me', validate(profileUpdateSchema), updateMe);
 router.get('/me/brand', getBrandSettings);
 router.put('/me/brand', upsertBrandSettings);
 router.get('/me/notifications', getNotificationPrefs);

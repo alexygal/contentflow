@@ -40,7 +40,7 @@ export async function handleWebhook(req: AuthRequest, res: Response, next: NextF
     );
 
     if (event.type === 'checkout.session.completed') {
-      const session = event.data.object as { metadata: { user_id: string; tier: string }; subscription: string };
+      const session = event.data.object as unknown as { metadata: { user_id: string; tier: string }; subscription: string };
       const { user_id, tier } = session.metadata;
       await pool.query('UPDATE users SET tier = $1, stripe_subscription_id = $2 WHERE id = $3', [
         tier, session.subscription, user_id,

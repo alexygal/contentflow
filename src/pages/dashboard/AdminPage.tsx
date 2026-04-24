@@ -3,6 +3,7 @@ import { Activity, AlertTriangle, CheckCircle, CreditCard, Database, Mail, Searc
 import { GlassCard, OutlineButton, StatCard, StatusPill, TabBar } from '../../components/ui';
 import { useAuth } from '../../contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
+import { api } from '../../utils/api';
 
 const MOCK_USERS_DATA = [
   { id: 'usr_01', name: 'Alex Rivera', email: 'alex@contentflow.ai', tier: 'growth', status: 'active', joined: 'Jan 12, 2025', revenue: '€2,500' },
@@ -61,16 +62,14 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (user?.role !== 'admin') return;
-    const token = localStorage.getItem('cf_token');
-    const headers = { Authorization: `Bearer ${token}` };
     Promise.all([
-      fetch('/api/admin/users', { headers }).then(r => r.ok ? r.json() : null),
-      fetch('/api/admin/health', { headers }).then(r => r.ok ? r.json() : null),
-      fetch('/api/admin/payments', { headers }).then(r => r.ok ? r.json() : null),
+      api.get('/api/admin/users').catch(() => null),
+      api.get('/api/admin/health').catch(() => null),
+      api.get('/api/admin/payments').catch(() => null),
     ]).then(([users, hlth, pmts]) => {
-      if (users) setUsersData(users);
-      if (hlth) setHealth(hlth);
-      if (pmts) setPayments(pmts);
+      if (users) setUsersData(users as typeof MOCK_USERS_DATA);
+      if (hlth) setHealth(hlth as typeof MOCK_HEALTH);
+      if (pmts) setPayments(pmts as typeof MOCK_PAYMENTS);
     }).catch(() => {});
   }, [user?.role]);
 

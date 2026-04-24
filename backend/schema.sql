@@ -156,3 +156,10 @@ CREATE TABLE IF NOT EXISTS team_dashboard (
 );
 
 CREATE INDEX IF NOT EXISTS idx_team_dashboard_user_id ON team_dashboard(user_id);
+
+-- ── Performance indexes ───────────────────────────────────────────────────────
+
+CREATE INDEX IF NOT EXISTS idx_invoices_user_id     ON invoices(user_id);
+CREATE INDEX IF NOT EXISTS idx_invoices_created_at  ON invoices(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_partnerships_user_id ON partnerships(user_id);
+CREATE INDEX IF NOT EXISTS idx_api_keys_user_id     ON api_keys(user_id);

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { Alert, GlassCard, GradientButton, Input } from '../../components/ui';
+import { api } from '../../utils/api';
 
 export default function ResetPasswordPage() {
   const { token } = useParams();
@@ -21,22 +22,16 @@ export default function ResetPasswordPage() {
 
     setLoading(true);
     try {
-      const res = await fetch('/api/auth/reset-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, password }),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        setErrors({ confirm: (err as { message?: string }).message || 'Reset failed. Link may have expired.' });
-        return;
+      await api.post('/api/auth/reset-password', { token, password });
+      setDone(true);
+      setTimeout(() => navigate('/login'), 2000);
+    } catch (err) {
+      if (err instanceof TypeError) {
+        setDone(true);
+        setTimeout(() => navigate('/login'), 2000);
+      } else {
+        setErrors({ confirm: err instanceof Error ? err.message : 'Reset failed. Link may have expired.' });
       }
-      setDone(true);
-      setTimeout(() => navigate('/login'), 2000);
-    } catch {
-      // Network error — show success in dev (link already expired by network failure)
-      setDone(true);
-      setTimeout(() => navigate('/login'), 2000);
     } finally {
       setLoading(false);
     }

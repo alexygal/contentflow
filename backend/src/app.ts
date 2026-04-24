@@ -28,7 +28,7 @@ app.use('/api/billing', billingRoutes);
 app.use('/api/admin',   adminRoutes);
 app.use('/api/team',    teamRoutes);
 
-app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
+app.get('/api/health', (_req, res) => res.json({ status: 'ok', timestamp: Date.now() }));
 
 app.use(errorHandler);
 

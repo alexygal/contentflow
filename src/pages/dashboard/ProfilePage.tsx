@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, AtSign, Camera, Check, Play, Tv2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { Alert, GlassCard, GradientButton, Input, OutlineButton, Select, TextArea } from '../../components/ui';
+import { api } from '../../utils/api';
 
 const NICHES = [
   'Tech & Creator Tools',
@@ -56,37 +57,21 @@ export default function ProfilePage() {
     setError('');
     setSaving(true);
     try {
-      const res = await fetch('/api/users/me', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('cf_token')}`,
-        },
-        body: JSON.stringify({
-          name: `${form.firstName} ${form.lastName}`.trim(),
-          email: form.email,
-          channelName: form.channelName,
-          niche: form.niche,
-          bio: form.bio,
-          website: form.website,
-          twitter: form.twitter,
-          instagram: form.instagram,
-          youtube: form.youtube,
-        }),
+      await api.patch('/api/users/me', {
+        name: `${form.firstName} ${form.lastName}`.trim(),
+        email: form.email,
+        channelName: form.channelName,
+        niche: form.niche,
+        bio: form.bio,
+        website: form.website,
+        twitter: form.twitter,
+        instagram: form.instagram,
+        youtube: form.youtube,
       });
-      if (!res.ok && res.status !== 0) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error((err as { message?: string }).message || 'Failed to save profile');
-      }
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
     } catch (err) {
-      if (err instanceof TypeError) {
-        setSaved(true);
-        setTimeout(() => setSaved(false), 2500);
-      } else {
-        setError(err instanceof Error ? err.message : 'Failed to save profile');
-      }
+      setError(err instanceof Error ? err.message : 'Failed to save profile');
     } finally {
       setSaving(false);
     }

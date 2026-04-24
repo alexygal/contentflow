@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowRight, Book, ChevronDown, MessageCircle, Play, Search, Zap } from 'lucide-react';
 import { Badge, Fade, GlassCard, GradientButton, Input, SectionHeader, TextArea } from '../../components/ui';
+import { api } from '../../utils/api';
 
 const TOPICS = [
   { icon: <Zap className="h-5 w-5 text-blue-400" />, title: 'Getting Started', count: 12 },
@@ -65,11 +66,7 @@ export default function HelpPage() {
   const submitForm = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await fetch('/api/support/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      });
+      await api.post('/api/support/contact', form);
     } catch {
       // Network error — still show success (message queued locally)
     }
